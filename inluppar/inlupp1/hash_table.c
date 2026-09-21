@@ -20,6 +20,10 @@ struct hash_table
   entry_t buckets[17];
 };
 
+static entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key);
+static void entry_destroy(entry_t *entry);
+static entry_t *entry_create(char *key, int value, entry_t *next);
+
 static size_t string_knr_hash(const char *str)
 {
   size_t result = 0;
@@ -44,27 +48,11 @@ static entry_t *entry_create(char *key, int value, entry_t *next)
   
 }
 
-static void entry_destroy(ioopm_hash_table_t *ht, char *key) {
-
-  size_t bucket = string_knr_hash(key);
-  entry_t *previous = NULL;
-  entry_t *current = &ht->buckets[bucket];
-
-  while (!strcmp(current->key, key) != 0) {
-    previous = current;
-    current = current->next;
-  }
-
-  if (previous == NULL)
-  {
-    current = current->next;
-  }
-  else 
-  {
-    previous->next = current->next;
-  }
-
-  free(current);
+static void entry_destroy(entry_t *entry) {
+    // Just nu gör den bara free. 
+    // Men om du senare i uppgiften (t.ex. för minneshantering av strängar) 
+    // behöver köra free(entry->key), är det HÄR du lägger till det!
+    free(entry);
 }
 
 
@@ -75,35 +63,40 @@ ioopm_hash_table_t *ioopm_hash_table_create() {
  
 }
 
-void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
+// Returnerar en int (1 för success, 0 för fail), och lägger värdet i pekaren 'result'
+int ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result) {
     
-    for (int i = 0; i < 17; i++) {
+    entry_t *previous = find_previous_entry(ht, key);
+    entry_t *current = previous->next;
+    
+    if (current != NULL && strcmp(current->key, key) == 0) {
         
-        
-        entry_t *current = ht->buckets[i].next; 
-        
-        while (current != NULL) {
-            
-            entry_t *next_node = current->next;
-            
-            
-            free(current);
-            
-            current = next_node;
+        // 1. Spara undan värdet INNAN noden raderas (Klassisk minnesfälla!)
+        if (result != NULL) {
+            *result = current->value;
         }
+        
+        // 2. Överbrygga hålet
+        previous->next = current->next;
+        
+        // 3. Frigör minnet
+        entry_destroy(current);
+        
+        return 1; // Success!
     }
     
-    free(ht);
+    return 0; // Fail! (Nyckeln fanns inte)
 }
 
 
 entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key) 
 {
-  size_t bucket = string_knr_hash(key);
+  size_t bucket = string_knr_hash(key) % 17;
+
   entry_t *previous = &ht->buckets[bucket];
   entry_t *current = previous->next;
 
-  while (!strcmp(current->key, key) != 0) {
+  while (current != NULL && strcmp(current->key, key) != 0) {
     previous = current;
     current = current->next;
   }
@@ -150,10 +143,38 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
   }
 }
 
-int ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key) {
-    // Här delegerar du det faktiska arbetet till din dolda funktion
-    entry_destroy(ht, key);
-
-    return 0;
+void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
+    // Gå igenom alla 17 buckets
+    for (int i = 0; i < 17; i++) {
+        
+        // Börja titta på noden EFTER dummyn (index 0 är dummyn)
+        entry_t *current = ht->buckets[i].next; 
+        
+        // Loopa igenom den länkade listan och förstör alla riktiga noder
+        while (current != NULL) {
+            entry_t *next_node = current->next; // Spara nästa-pekaren
+            
+            // Använd din entry_destroy-funktion!
+            entry_destroy(current); 
+            
+            current = next_node; // Hoppa till nästa
+        }
+    }
+    
+    // När alla länkade listor är tömda, frigör hela tabellen
+    free(ht);
 }
 
+
+void remove_entry(ioopm_hash_table_t *ht, char *key) {
+  
+  entry_t *previous = find_previous_entry(ht, key);
+  entry_t *current = previous->next;
+
+  if (current != NULL && strcmp(current->key, key) == 0) {
+    
+    previous->next = current->next;
+    
+    entry_destroy(current);
+  }
+}

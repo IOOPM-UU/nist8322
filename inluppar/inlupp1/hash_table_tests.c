@@ -115,11 +115,74 @@ void test_remove_key()
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
   CU_ASSERT_EQUAL(result, 99);
 
-  ioopm_hash_table_remove(ht, key);
+  ioopm_hash_table_remove(ht, key, &result);
 
 
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
 
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_remove_entry() 
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  char *key = "a";
+  int result = 0;
+
+  // 1. Arrange: Sätt in en nyckel och bevisa att den existerar
+  ioopm_hash_table_insert(ht, key, 99);
+  CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
+  CU_ASSERT_EQUAL(result, 99);
+
+  // 2. Act: Anropa din stub-funktion
+  remove_entry(ht, key);
+
+  // 3. Assert: Kontrollera att nyckeln är borta.
+  // (OBS: Detta kommer att MISSLYCKAS just nu, vilket är exakt vad vi vill i TDD!)
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+
+  // 4. Cleanup
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_remove_entry_not_inserted() 
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  
+  // 1. Skapa variablerna kompilatorn behöver
+  char *key = "spöket"; 
+  int result = 0;
+
+  // 2. Act: Försök ta bort en nyckel från en HELT tom tabell.
+  // Det är HÄR ditt inbyggda skydd (current != NULL) kommer att rädda programmet 
+  // från att krascha när den letar i en tom bucket.
+  remove_entry(ht, key);
+
+  // 3. Assert: Bevisa att datastrukturen överlevde och att nyckeln (fortfarande) inte finns
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));
+
+  // 4. Cleanup
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_remove_multiple_elements() 
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  int result = 0;
+  
+  int removed_value = 0; 
+
+  ioopm_hash_table_insert(ht, "key1", 10);
+  ioopm_hash_table_insert(ht, "key2", 20);
+  ioopm_hash_table_insert(ht, "key3", 30);
+
+  CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, "key2", &removed_value));
+
+  CU_ASSERT_EQUAL(removed_value, 20);
+
+  CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, "key2", &result));
+
+  // 5. Cleanup
   ioopm_hash_table_destroy(ht);
 }
 
@@ -138,7 +201,10 @@ int main() {
     (CU_add_test(my_test_suite, "Test Insert Once", test_insert_once) == NULL) || 
     (CU_add_test(my_test_suite, "Test Key Already In Use", test_key_in_use) == NULL) || 
     (CU_add_test(my_test_suite, "Test Insert Multiple Keys", test_insert_multiple_keys) == NULL) ||
-    (CU_add_test(my_test_suite, "Test Destroy Entry", test_remove_key) == NULL)
+    (CU_add_test(my_test_suite, "Test Destroy Entry", test_remove_key) == NULL) || 
+    (CU_add_test(my_test_suite, "Test Remove Entry", test_remove_entry) == NULL) ||
+    (CU_add_test(my_test_suite, "Test Remove Entry Not Inserted", test_remove_entry_not_inserted) == NULL) ||
+    (CU_add_test(my_test_suite, "Test Remove Multiple Elements", test_remove_multiple_elements) == NULL)
   )
     {
       CU_cleanup_registry();
