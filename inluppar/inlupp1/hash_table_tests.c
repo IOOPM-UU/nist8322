@@ -134,8 +134,8 @@ void test_remove_entry()
   CU_ASSERT_TRUE(ioopm_hash_table_lookup(ht, key, &result));
   CU_ASSERT_EQUAL(result, 99);
 
-  // 2. Act: Anropa din stub-funktion
-  remove_entry(ht, key);
+int removed_value = 0;
+CU_ASSERT_TRUE(ioopm_hash_table_remove(ht, key, &removed_value));
 
   // 3. Assert: Kontrollera att nyckeln är borta.
   // (OBS: Detta kommer att MISSLYCKAS just nu, vilket är exakt vad vi vill i TDD!)
@@ -156,7 +156,8 @@ void test_remove_entry_not_inserted()
   // 2. Act: Försök ta bort en nyckel från en HELT tom tabell.
   // Det är HÄR ditt inbyggda skydd (current != NULL) kommer att rädda programmet 
   // från att krascha när den letar i en tom bucket.
-  remove_entry(ht, key);
+  int removed_value = 0;
+  CU_ASSERT_FALSE(ioopm_hash_table_remove(ht, key, &removed_value));
 
   // 3. Assert: Bevisa att datastrukturen överlevde och att nyckeln (fortfarande) inte finns
   CU_ASSERT_FALSE(ioopm_hash_table_lookup(ht, key, &result));

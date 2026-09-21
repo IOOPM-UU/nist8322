@@ -40,5 +40,3 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result);
 /// @param key key to remove
 /// @return the value mapped to by key (FIXME: what if the key does not exist?)
 int ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result);
-
-void remove_entry(ioopm_hash_table_t *ht, char *key);

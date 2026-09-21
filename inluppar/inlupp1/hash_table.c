@@ -3,6 +3,7 @@
 #include "hash_table.h"
 #include <stdbool.h>
 #include <string.h>
+#define No_Buckets 17
 
 typedef struct entry entry_t;
 
@@ -15,9 +16,8 @@ struct entry
 
 struct hash_table
 {
-  // DODGE: hard-coding number of buckets as 17.
-  // NOTE: addressing this dodge is optional.
-  entry_t buckets[17];
+
+  entry_t buckets[No_Buckets];
 };
 
 static entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key);
@@ -91,7 +91,7 @@ int ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result) {
 
 entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key) 
 {
-  size_t bucket = string_knr_hash(key) % 17;
+  size_t bucket = string_knr_hash(key) % No_Buckets;
 
   entry_t *previous = &ht->buckets[bucket];
   entry_t *current = previous->next;
@@ -144,8 +144,8 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
 }
 
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
-    // Gå igenom alla 17 buckets
-    for (int i = 0; i < 17; i++) {
+    
+    for (int i = 0; i < No_Buckets; i++) {
         
         // Börja titta på noden EFTER dummyn (index 0 är dummyn)
         entry_t *current = ht->buckets[i].next; 
