@@ -178,3 +178,57 @@ void remove_entry(ioopm_hash_table_t *ht, char *key) {
     entry_destroy(current);
   }
 }
+
+// TODO: documentation
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, char *key)
+{
+  entry_t *previous = find_previous_entry(ht, key);
+  entry_t *current = previous->next;
+
+  if (ioopm_hash_table_lookup(ht, key, &current->value) == true) 
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+static int bucket_size(entry_t *current_node)
+{
+  int size = 0;
+
+  while (current_node != NULL)
+  {
+    size = size + 1;
+    current_node = current_node->next;
+  }
+
+  return size;
+}
+
+
+int ioopm_hash_table_size(ioopm_hash_table_t *ht)
+{
+  int size = 0;
+  for (int i = 0; i < No_Buckets; i++) {
+    size += bucket_size(ht->buckets[i].next);
+  }
+  return size;
+}
+
+
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
+{
+  if (ioopm_hash_table_size(ht) == 0)
+  {
+    return true;
+  } 
+  else
+  {
+    return false;
+  }
+}
+
