@@ -1,24 +1,11 @@
 #include <stddef.h>
 #include <stdlib.h>
-#include "hash_table.h"
 #include <stdbool.h>
 #include <string.h>
-#define No_Buckets 17
 
-typedef struct entry entry_t;
+#include "hash_table.h"         
+#include "hash_table_private.h"
 
-struct entry
-{
-  char *key;     // holds the key
-  int value;     // holds the value
-  entry_t *next; // points to the next entry (possibly NULL)
-};
-
-struct hash_table
-{
-
-  entry_t buckets[No_Buckets];
-};
 
 static entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key);
 static void entry_destroy(entry_t *entry);
