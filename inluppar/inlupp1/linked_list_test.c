@@ -1,5 +1,6 @@
 #include <CUnit/Basic.h>
 #include "linked_list.h"
+#include "list_iterator.h"
 
 int init_suite(void) {
   return 0;
@@ -134,12 +135,73 @@ void test_list_empty() {
     ioopm_list_destroy(list);
 }
 
+void test_create_destroy_iterator(void) {
+    ioopm_list_t *list = ioopm_list_create();
+    ioopm_list_append(list, 42);
+
+    ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
+    CU_ASSERT_PTR_NOT_NULL(iter);
+
+    ioopm_list_iterator_destroy(iter);
+    ioopm_list_destroy(list);
+}
+
+void test_iterator_at_end(void) {
+    
+    ioopm_list_t *empty_list = ioopm_list_create();
+    ioopm_list_iterator_t *iter_empty = ioopm_list_iterator_create(empty_list);
+    
+    CU_ASSERT_TRUE(ioopm_list_iterator_at_end(iter_empty));
+    
+    
+    ioopm_list_t *list = ioopm_list_create();
+    ioopm_list_append(list, 10);
+    ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
+    
+    CU_ASSERT_FALSE(ioopm_list_iterator_at_end(iter));
+
+    ioopm_list_iterator_destroy(iter_empty);
+    ioopm_list_destroy(empty_list);
+    ioopm_list_iterator_destroy(iter);
+    ioopm_list_destroy(list);
+}
+
+void test_iterator_advance_and_current(void) {
+    ioopm_list_t *list = ioopm_list_create();
+    ioopm_list_append(list, 10);
+    ioopm_list_append(list, 20);
+    ioopm_list_append(list, 30);
+
+    ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
+
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter), 10);
+
+    ioopm_list_iterator_advance(iter);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter), 20);
+
+    ioopm_list_iterator_advance(iter);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter), 30);
+    CU_ASSERT_FALSE(ioopm_list_iterator_at_end(iter));
+
+    ioopm_list_iterator_advance(iter);
+    CU_ASSERT_TRUE(ioopm_list_iterator_at_end(iter));
+
+    ioopm_list_iterator_destroy(iter);
+    ioopm_list_destroy(list);
+}
+
 int main() {
   if (CU_initialize_registry() != CUE_SUCCESS)
     return CU_get_error();
 
-  CU_pSuite my_test_suite = CU_add_suite("Linked Lits Tests", init_suite, clean_suite);
+  CU_pSuite my_test_suite = CU_add_suite("Linked List Tests", init_suite, clean_suite);
   if (my_test_suite == NULL) {
+      CU_cleanup_registry();
+      return CU_get_error();
+  }
+
+  CU_pSuite iter_suite = CU_add_suite("List Iterator Tests", init_suite, clean_suite);
+  if (iter_suite == NULL) {
       CU_cleanup_registry();
       return CU_get_error();
   }
@@ -156,6 +218,16 @@ int main() {
     (CU_add_test(my_test_suite, "Get element", test_get_element) == NULL) ||
     (CU_add_test(my_test_suite, "Size of list", test_size_of_list) == NULL) ||
     (CU_add_test(my_test_suite, "List Empty", test_list_empty) == NULL)
+  )
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+    if (
+    (CU_add_test(iter_suite, "Create & Destroy Iterator", test_create_destroy_iterator) == NULL) ||
+    (CU_add_test(iter_suite, "Iterator at end", test_iterator_at_end) == NULL) ||
+    (CU_add_test(iter_suite, "Iterator advance & current", test_iterator_advance_and_current) == NULL)
   )
     {
       CU_cleanup_registry();
