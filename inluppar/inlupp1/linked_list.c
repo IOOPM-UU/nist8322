@@ -1,0 +1,176 @@
+#include <stdlib.h>
+#include "linked_list.h"
+#include <assert.h>
+
+typedef struct link ioopm_link_t;
+
+struct link {
+    int element;
+    ioopm_link_t *next;
+};
+
+
+struct list {
+    ioopm_link_t *first;
+    ioopm_link_t *last;
+    int size;
+};
+
+ioopm_list_t *ioopm_list_create(void) {
+    
+    ioopm_list_t *list = calloc(1, sizeof(ioopm_list_t));
+
+    if (list != NULL) {
+        
+        ioopm_link_t *dummy = calloc(1, sizeof(ioopm_link_t));
+        
+        list->first = dummy;
+        list->last  = dummy; // Tåget slutar vid dummyn
+        list->size  = 0;
+    }
+
+    return list;
+}
+
+void ioopm_list_destroy(ioopm_list_t *list) {
+    ioopm_link_t *current = list->first;
+    
+    while (current != NULL) {
+        ioopm_link_t *next = current->next;
+        free(current);
+        current = next;
+    }
+    
+    free(list);
+}
+
+int ioopm_list_size(ioopm_list_t *list) {
+    return list->size;
+}
+
+void ioopm_list_append(ioopm_list_t *list, int value) {
+    ioopm_link_t *new_link = calloc(1, sizeof(ioopm_link_t));
+
+    if (new_link != NULL) {
+        new_link->element = value;
+
+        list->last->next = new_link;
+
+        list->last = new_link;
+        list->size++;
+    }
+}
+
+void ioopm_list_prepend(ioopm_list_t *list, int value) {
+    ioopm_link_t *new_link = calloc(1, sizeof(ioopm_link_t));
+    
+    if (new_link != NULL) {
+        new_link->element = value;
+
+        new_link->next = list->first->next;
+
+        list->first->next = new_link;
+
+        if (list->size == 0) {
+            list->last = new_link;
+        }
+
+        list->size++;
+    }
+}
+
+int ioopm_list_head(ioopm_list_t *list) {
+    
+    assert(list->size > 0); 
+    
+    int head = list->first->next->element;
+    return head;
+}
+
+int ioopm_list_last(ioopm_list_t *list) {
+    int last = list->last->element;
+    return last;
+}
+
+void ioopm_list_insert(ioopm_list_t *list, int index, int value) {
+    
+    assert(index >= 0 && index <= list->size);
+
+    ioopm_link_t *new_link = calloc(1, sizeof(ioopm_link_t));
+    new_link->element = value;
+
+    int counter = 0;
+    ioopm_link_t * current = list->first;
+
+    while (counter != index) {
+        current = current->next;
+
+        counter++;
+    }
+    
+    new_link->next = current->next;
+    current->next = new_link;
+
+    if (index == list->size) {
+        list->last = new_link;
+    }
+
+    list->size++;
+}
+
+int ioopm_list_remove(ioopm_list_t *list, int index) {
+
+    assert(index >= 0 && index < list->size);
+
+    int counter = 0;
+    ioopm_link_t *current = list->first;
+
+    while (counter != index) {
+        current = current->next;
+
+        counter++;
+    }
+    ioopm_link_t *removed_link = current->next;
+
+    int removed_value = removed_link->element;
+
+    current->next = current->next->next;
+
+    if (index == list->size - 1) {
+        list->last = current;
+    }
+
+    free(removed_link);
+
+    list->size--;
+
+    return removed_value;
+}
+
+int ioopm_list_get(ioopm_list_t *list, int index) {
+
+    assert(index >= 0 && index < list->size);
+
+    int counter = 0;
+    ioopm_link_t *current = list->first;
+
+    while (counter != index) {
+        current = current->next;
+
+        counter++;
+    }
+
+    return current->next->element;
+
+}
+
+bool ioopm_list_is_empty(ioopm_list_t *list) {
+    
+    if (ioopm_list_size(list) == 0) {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
