@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "linked_list_private.h"
+#include <stddef.h>
 
 struct list_iterator {
     ioopm_link_t *current;
@@ -44,12 +45,12 @@ void ioopm_list_iterator_advance(ioopm_list_iterator_t *iter) {
     }
 }
 
-int ioopm_list_iterator_current(ioopm_list_iterator_t *iter) {
+elem_t ioopm_list_iterator_current(ioopm_list_iterator_t *iter) {
     assert(iter != NULL);
     
-    return iter->current != NULL ? iter->current->element : 0;
+    return iter->current != NULL ? iter->current->element : int_elem(0);
 }
 
-int ioopm_list_iterator_remove(ioopm_list_iterator_t *iter) {
-    
-}
+/* int ioopm_list_iterator_remove(ioopm_list_iterator_t *iter) {
+    // Optional
+} */

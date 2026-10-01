@@ -1,11 +1,12 @@
 #pragma once
 #include "linked_list.h"
 #include <stddef.h>
+#include "common.h"
 
 typedef struct link ioopm_link_t;
 
 struct link {
-    int element;
+    elem_t element;
     struct link *next;
 };
 

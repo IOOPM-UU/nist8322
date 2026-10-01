@@ -25,11 +25,11 @@ void test_append_elements() {
    
     ioopm_list_t *list = ioopm_list_create();
 
-    ioopm_list_append(list, 10);
+    ioopm_list_append(list, int_elem(10));
     
     CU_ASSERT_TRUE(ioopm_list_size(list) == 1); 
 
-    ioopm_list_append(list, 20);
+    ioopm_list_append(list, int_elem(20));
     
      CU_ASSERT_TRUE(ioopm_list_size(list) == 2); 
 
@@ -40,10 +40,10 @@ void test_prepend_elements() {
     
     ioopm_list_t *list = ioopm_list_create();
 
-    ioopm_list_prepend(list, 10);
+    ioopm_list_prepend(list, int_elem(10));
     CU_ASSERT_TRUE(ioopm_list_size(list) == 1); 
 
-    ioopm_list_prepend(list, 20);
+    ioopm_list_prepend(list, int_elem(20));
     CU_ASSERT_TRUE(ioopm_list_size(list) == 2); 
 
     ioopm_list_destroy(list);
@@ -53,10 +53,10 @@ void test_head_of_list() {
 
     ioopm_list_t *list = ioopm_list_create();
 
-    ioopm_list_prepend(list, 10);
-    ioopm_list_prepend(list, 20);
+    ioopm_list_prepend(list, int_elem(10));
+    ioopm_list_prepend(list, int_elem(20));
 
-    CU_ASSERT_TRUE(ioopm_list_head(list) == 20);
+    CU_ASSERT_TRUE(ioopm_list_head(list).i == 20);
 
     ioopm_list_destroy(list);
 
@@ -65,11 +65,11 @@ void test_head_of_list() {
 void test_last_element() {
     ioopm_list_t *list = ioopm_list_create();
 
-    ioopm_list_prepend(list, 10);
-    ioopm_list_prepend(list, 20);
-    ioopm_list_append(list, 30);
+    ioopm_list_prepend(list, int_elem(10));
+    ioopm_list_prepend(list, int_elem(20));
+    ioopm_list_append(list, int_elem(30));
 
-    CU_ASSERT_TRUE(ioopm_list_last(list) == 30);
+    CU_ASSERT_TRUE(ioopm_list_last(list).i == 30);
 
     ioopm_list_destroy(list);
 }
@@ -77,12 +77,12 @@ void test_last_element() {
 void test_insert_element() {
 
     ioopm_list_t *list = ioopm_list_create();
-    ioopm_list_append(list, 10);
-    ioopm_list_append(list, 20);
-    ioopm_list_append(list, 30);
-    ioopm_list_insert(list, 0, 40);
+    ioopm_list_append(list, int_elem(10));
+    ioopm_list_append(list, int_elem(20));
+    ioopm_list_append(list, int_elem(30));
+    ioopm_list_insert(list, 0, int_elem(40));
 
-    CU_ASSERT_TRUE(ioopm_list_head(list) == 40);
+    CU_ASSERT_TRUE(ioopm_list_head(list).i == 40);
 
     ioopm_list_destroy(list);
 }
@@ -90,13 +90,13 @@ void test_insert_element() {
 void test_remove_element() {
 
     ioopm_list_t *list = ioopm_list_create();
-    ioopm_list_append(list, 10);
-    ioopm_list_append(list, 20);
-    ioopm_list_append(list, 30);
+    ioopm_list_append(list, int_elem(10));
+    ioopm_list_append(list, int_elem(20));
+    ioopm_list_append(list, int_elem(30));
 
     ioopm_list_remove(list, 0);
 
-    CU_ASSERT_FALSE(ioopm_list_head(list) == 10);
+    CU_ASSERT_FALSE(ioopm_list_head(list).i == 10);
 
     ioopm_list_destroy(list);
 }
@@ -104,11 +104,11 @@ void test_remove_element() {
 void test_get_element() {
 
     ioopm_list_t *list = ioopm_list_create();
-    ioopm_list_append(list, 10);
-    ioopm_list_append(list, 20);
-    ioopm_list_append(list, 30);
+    ioopm_list_append(list, int_elem(10));
+    ioopm_list_append(list, int_elem(20));
+    ioopm_list_append(list, int_elem(30));
 
-    CU_ASSERT_TRUE(ioopm_list_get(list, 1) == 20);
+    CU_ASSERT_TRUE(ioopm_list_get(list, 1).i == 20);
 
     ioopm_list_destroy(list);
 }
@@ -116,8 +116,8 @@ void test_get_element() {
 void test_size_of_list() {
 
     ioopm_list_t *list = ioopm_list_create();
-    ioopm_list_append(list, 10);
-    ioopm_list_append(list, 20);
+    ioopm_list_append(list, int_elem(10));
+    ioopm_list_append(list, int_elem(20));
 
     CU_ASSERT_TRUE(ioopm_list_size(list) == 2);
 
@@ -127,8 +127,8 @@ void test_size_of_list() {
 void test_list_empty() {
 
     ioopm_list_t *list = ioopm_list_create();
-    ioopm_list_append(list, 10);
-    ioopm_list_append(list, 20);
+    ioopm_list_append(list, int_elem(10));
+    ioopm_list_append(list, int_elem(20));
 
     CU_ASSERT_FALSE(ioopm_list_is_empty(list));
 
@@ -137,7 +137,7 @@ void test_list_empty() {
 
 void test_create_destroy_iterator(void) {
     ioopm_list_t *list = ioopm_list_create();
-    ioopm_list_append(list, 42);
+    ioopm_list_append(list, int_elem(42));
 
     ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
     CU_ASSERT_PTR_NOT_NULL(iter);
@@ -155,7 +155,7 @@ void test_iterator_at_end(void) {
     
     
     ioopm_list_t *list = ioopm_list_create();
-    ioopm_list_append(list, 10);
+    ioopm_list_append(list, int_elem(10));
     ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
     
     CU_ASSERT_FALSE(ioopm_list_iterator_at_end(iter));
@@ -168,19 +168,19 @@ void test_iterator_at_end(void) {
 
 void test_iterator_advance_and_current(void) {
     ioopm_list_t *list = ioopm_list_create();
-    ioopm_list_append(list, 10);
-    ioopm_list_append(list, 20);
-    ioopm_list_append(list, 30);
+    ioopm_list_append(list, int_elem(10));
+    ioopm_list_append(list, int_elem(20));
+    ioopm_list_append(list, int_elem(30));
 
     ioopm_list_iterator_t *iter = ioopm_list_iterator_create(list);
 
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter), 10);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter).i, 10);
 
     ioopm_list_iterator_advance(iter);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter), 20);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter).i, 20);
 
     ioopm_list_iterator_advance(iter);
-    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter), 30);
+    CU_ASSERT_EQUAL(ioopm_list_iterator_current(iter).i, 30);
     CU_ASSERT_FALSE(ioopm_list_iterator_at_end(iter));
 
     ioopm_list_iterator_advance(iter);

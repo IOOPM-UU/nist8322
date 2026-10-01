@@ -7,23 +7,25 @@
 #include "hash_table_private.h"
 
 
-static entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key);
+static entry_t *find_previous_entry(ioopm_hash_table_t *ht, elem_t key);
 static void entry_destroy(entry_t *entry);
-static entry_t *entry_create(char *key, int value, entry_t *next);
+static entry_t *entry_create(elem_t key, elem_t value, entry_t *next);
 
-static size_t string_knr_hash(const char *str)
+size_t string_knr_hash(elem_t key)
 {
-  size_t result = 0;
-  while (*str != '\0')
-  {
-    result = result * 31 + ((unsigned char) *str);
-    str++;
-  }
-  return result;
+    const char *str = key.s;
+    size_t result = 0;
+    
+    while (*str != '\0')
+    {
+        result = result * 31 + ((unsigned char) *str);
+        str++;
+    }
+    return result;
 }
 
 
-static entry_t *entry_create(char *key, int value, entry_t *next)
+static entry_t *entry_create(elem_t key, elem_t value, entry_t *next)
 {
   entry_t *entry = malloc(sizeof(entry_t));
 
@@ -42,19 +44,25 @@ static void entry_destroy(entry_t *entry) {
 
 
 
-ioopm_hash_table_t *ioopm_hash_table_create() {
-
-    return calloc(1, sizeof(ioopm_hash_table_t));
- 
+ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn) {
+    
+    ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
+    
+   
+    ht->hash_fn = hash_fn;
+    ht->key_eq_fn = key_eq_fn;
+    
+   
+    return ht;
 }
 
 // Returnerar en int (1 för success, 0 för fail), och lägger värdet i pekaren 'result'
-int ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result) {
+int ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result) {
     
     entry_t *previous = find_previous_entry(ht, key);
     entry_t *current = previous->next;
     
-    if (current != NULL && strcmp(current->key, key) == 0) {
+    if (current != NULL && ht->key_eq_fn(current->key, key) == true) {
         
         
         if (result != NULL) {
@@ -74,22 +82,22 @@ int ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result) {
 }
 
 
-entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key) 
+entry_t *find_previous_entry(ioopm_hash_table_t *ht, elem_t key) 
 {
-  size_t bucket = string_knr_hash(key) % No_Buckets;
+  size_t bucket = ht->hash_fn(key) % No_Buckets;
 
   entry_t *previous = &ht->buckets[bucket];
   entry_t *current = previous->next;
 
-  while (current != NULL && strcmp(current->key, key) != 0) {
+  while (current != NULL && ht->key_eq_fn(current->key, key) == false) {
     previous = current;
     current = current->next;
-  }
+}
 
   return previous;
 }
 
-void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
+void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value)
 {
   // find previous entry, or the last entry if the key does not exist
   entry_t *previous = find_previous_entry(ht, key);
@@ -105,27 +113,19 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, char *key, int value)
   }
 }
 
-bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
-{
-  entry_t *previous = find_previous_entry(ht, key);
-  entry_t *current = previous->next;
-
-  
-  while (current != NULL && strcmp(current->key, key) != 0)
-  {
-    current = current->next;
-  }
-
-  // if the key exists, return the value, otherwise, indicate that the lookup failed
-  if (current != NULL)
-  {
-    *result = current->value;
-    return true;
-  }
-  else
-  {
+bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t key, elem_t *result) {
+    // 1. Låt din redan fixade hjälpfunktion göra sökjobbet
+    entry_t *previous = find_previous_entry(ht, key);
+    entry_t *current = previous->next;
+    
+    // 2. Kolla om vi hittade en matchning
+    if (current != NULL && ht->key_eq_fn(current->key, key)) {
+        if (result != NULL) {
+            *result = current->value;
+        }
+        return true;
+    }
     return false;
-  }
 }
 
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
@@ -149,12 +149,12 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
 }
 
 
-void remove_entry(ioopm_hash_table_t *ht, char *key) {
+void remove_entry(ioopm_hash_table_t *ht, elem_t key) {
   
   entry_t *previous = find_previous_entry(ht, key);
   entry_t *current = previous->next;
 
-  if (current != NULL && strcmp(current->key, key) == 0) {
+  if (current != NULL && ht->key_eq_fn(current->key, key) == true) {
     
     previous->next = current->next;
     
@@ -163,19 +163,9 @@ void remove_entry(ioopm_hash_table_t *ht, char *key) {
 }
 
 // TODO: documentation
-bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, char *key)
-{
-  entry_t *previous = find_previous_entry(ht, key);
-  entry_t *current = previous->next;
-
-  if (ioopm_hash_table_lookup(ht, key, &current->value) == true) 
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, elem_t key) {
+    // Skicka in NULL som result-pekare, vi bryr oss bara om true/false
+    return ioopm_hash_table_lookup(ht, key, NULL);
 }
 
 

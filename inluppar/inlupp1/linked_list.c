@@ -2,6 +2,7 @@
 #include "linked_list.h"
 #include <assert.h>
 #include "linked_list_private.h"
+#include "common.h"
 
 typedef struct link ioopm_link_t;
 
@@ -37,7 +38,7 @@ size_t ioopm_list_size(ioopm_list_t *list) {
     return list->size;
 }
 
-void ioopm_list_append(ioopm_list_t *list, int value) {
+void ioopm_list_append(ioopm_list_t *list, elem_t value) {
     ioopm_link_t *new_link = calloc(1, sizeof(ioopm_link_t));
 
     if (new_link != NULL) {
@@ -50,7 +51,7 @@ void ioopm_list_append(ioopm_list_t *list, int value) {
     }
 }
 
-void ioopm_list_prepend(ioopm_list_t *list, int value) {
+void ioopm_list_prepend(ioopm_list_t *list, elem_t value) {
     ioopm_link_t *new_link = calloc(1, sizeof(ioopm_link_t));
     
     if (new_link != NULL) {
@@ -68,20 +69,20 @@ void ioopm_list_prepend(ioopm_list_t *list, int value) {
     }
 }
 
-int ioopm_list_head(ioopm_list_t *list) {
+elem_t ioopm_list_head(ioopm_list_t *list) {
     
     assert(list->size > 0); 
     
-    int head = list->first->next->element;
+    elem_t head = list->first->next->element;
     return head;
 }
 
-int ioopm_list_last(ioopm_list_t *list) {
-    int last = list->last->element;
+elem_t ioopm_list_last(ioopm_list_t *list) {
+    elem_t last = list->last->element;
     return last;
 }
 
-void ioopm_list_insert(ioopm_list_t *list, size_t index, int value) {
+void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value) {
     
     assert(index >= 0 && index <= list->size);
 
@@ -107,7 +108,7 @@ void ioopm_list_insert(ioopm_list_t *list, size_t index, int value) {
     list->size++;
 }
 
-int ioopm_list_remove(ioopm_list_t *list, size_t index) {
+elem_t ioopm_list_remove(ioopm_list_t *list, size_t index) {
 
     assert(index >= 0 && index < list->size);
 
@@ -121,7 +122,7 @@ int ioopm_list_remove(ioopm_list_t *list, size_t index) {
     }
     ioopm_link_t *removed_link = current->next;
 
-    int removed_value = removed_link->element;
+    elem_t removed_value = removed_link->element;
 
     current->next = current->next->next;
 
@@ -136,7 +137,7 @@ int ioopm_list_remove(ioopm_list_t *list, size_t index) {
     return removed_value;
 }
 
-int ioopm_list_get(ioopm_list_t *list, size_t index) {
+elem_t ioopm_list_get(ioopm_list_t *list, size_t index) {
 
     assert(index >= 0 && index < list->size);
 
