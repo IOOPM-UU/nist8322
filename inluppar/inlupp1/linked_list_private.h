@@ -1,5 +1,6 @@
 #pragma once
 #include "linked_list.h"
+#include <stddef.h>
 
 typedef struct link ioopm_link_t;
 

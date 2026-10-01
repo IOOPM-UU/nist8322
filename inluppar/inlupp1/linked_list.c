@@ -1,20 +1,9 @@
 #include <stdlib.h>
 #include "linked_list.h"
 #include <assert.h>
+#include "linked_list_private.h"
 
 typedef struct link ioopm_link_t;
-
-struct link {
-    int element;
-    ioopm_link_t *next;
-};
-
-
-struct list {
-    ioopm_link_t *first;
-    ioopm_link_t *last;
-    int size;
-};
 
 ioopm_list_t *ioopm_list_create(void) {
     
@@ -44,7 +33,7 @@ void ioopm_list_destroy(ioopm_list_t *list) {
     free(list);
 }
 
-int ioopm_list_size(ioopm_list_t *list) {
+size_t ioopm_list_size(ioopm_list_t *list) {
     return list->size;
 }
 
@@ -92,7 +81,7 @@ int ioopm_list_last(ioopm_list_t *list) {
     return last;
 }
 
-void ioopm_list_insert(ioopm_list_t *list, int index, int value) {
+void ioopm_list_insert(ioopm_list_t *list, size_t index, int value) {
     
     assert(index >= 0 && index <= list->size);
 
@@ -118,7 +107,7 @@ void ioopm_list_insert(ioopm_list_t *list, int index, int value) {
     list->size++;
 }
 
-int ioopm_list_remove(ioopm_list_t *list, int index) {
+int ioopm_list_remove(ioopm_list_t *list, size_t index) {
 
     assert(index >= 0 && index < list->size);
 
@@ -147,7 +136,7 @@ int ioopm_list_remove(ioopm_list_t *list, int index) {
     return removed_value;
 }
 
-int ioopm_list_get(ioopm_list_t *list, int index) {
+int ioopm_list_get(ioopm_list_t *list, size_t index) {
 
     assert(index >= 0 && index < list->size);
 
@@ -165,7 +154,7 @@ int ioopm_list_get(ioopm_list_t *list, int index) {
 }
 
 bool ioopm_list_is_empty(ioopm_list_t *list) {
-    
+
     if (ioopm_list_size(list) == 0) {
         return true;
     }

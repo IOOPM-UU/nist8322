@@ -36,9 +36,7 @@ static entry_t *entry_create(char *key, int value, entry_t *next)
 }
 
 static void entry_destroy(entry_t *entry) {
-    // Just nu gör den bara free. 
-    // Men om du senare i uppgiften (t.ex. för minneshantering av strängar) 
-    // behöver köra free(entry->key), är det HÄR du lägger till det!
+
     free(entry);
 }
 
@@ -58,7 +56,7 @@ int ioopm_hash_table_remove(ioopm_hash_table_t *ht, char *key, int *result) {
     
     if (current != NULL && strcmp(current->key, key) == 0) {
         
-        // 1. Spara undan värdet INNAN noden raderas (Klassisk minnesfälla!)
+        
         if (result != NULL) {
             *result = current->value;
         }
@@ -132,23 +130,21 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, char *key, int *result)
 
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht) {
     
-    for (int i = 0; i < No_Buckets; i++) {
+    for (size_t i = 0; i < No_Buckets; i++) {
         
-        // Börja titta på noden EFTER dummyn (index 0 är dummyn)
+        
         entry_t *current = ht->buckets[i].next; 
         
-        // Loopa igenom den länkade listan och förstör alla riktiga noder
         while (current != NULL) {
-            entry_t *next_node = current->next; // Spara nästa-pekaren
+            entry_t *next_node = current->next;
             
-            // Använd din entry_destroy-funktion!
+            
             entry_destroy(current); 
             
-            current = next_node; // Hoppa till nästa
+            current = next_node;
         }
     }
     
-    // När alla länkade listor är tömda, frigör hela tabellen
     free(ht);
 }
 
@@ -183,9 +179,9 @@ bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, char *key)
 }
 
 
-static int bucket_size(entry_t *current_node)
+static size_t bucket_size(entry_t *current_node)
 {
-  int size = 0;
+  size_t size = 0;
 
   while (current_node != NULL)
   {
@@ -197,10 +193,10 @@ static int bucket_size(entry_t *current_node)
 }
 
 
-int ioopm_hash_table_size(ioopm_hash_table_t *ht)
+size_t ioopm_hash_table_size(ioopm_hash_table_t *ht)
 {
-  int size = 0;
-  for (int i = 0; i < No_Buckets; i++) {
+  size_t size = 0;
+  for (size_t i = 0; i < No_Buckets; i++) {
     size += bucket_size(ht->buckets[i].next);
   }
   return size;

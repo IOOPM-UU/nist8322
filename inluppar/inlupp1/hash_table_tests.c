@@ -1,6 +1,7 @@
 #include <CUnit/Basic.h>
 #include "hash_table.h"
 #include "hash_table_iterator.h"
+#include <stddef.h>
 
 int init_suite(void) {
   return 0;
@@ -405,11 +406,11 @@ void test_iter_several_entries()
   int values[3] = {0, 1, 2};
 
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  for (int i = 0; i != 3; ++i) {
+  for (size_t i = 0; i != 3; i++) {
     ioopm_hash_table_insert(ht, keys[i], values[i]);
   }
 
-  int iteration_count = 0;
+  size_t iteration_count = 0;
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
   
   while (!ioopm_hash_table_iterator_at_end(it)) {
@@ -434,7 +435,7 @@ void test_iter_exactly_once()
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
 
   // Använder ints (räknare) enligt instruktionen
-  int count_k1 = 0, count_k2 = 0, count_k3 = 0;
+  size_t count_k1 = 0, count_k2 = 0, count_k3 = 0;
 
   while (!ioopm_hash_table_iterator_at_end(it))
   {
@@ -480,7 +481,7 @@ void test_iter_same_bucket()
     ioopm_hash_table_insert(ht, keys[i], i);
   }
 
-  int iteration_count = 0;
+  size_t iteration_count = 0;
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
   
   while (!ioopm_hash_table_iterator_at_end(it)) {
