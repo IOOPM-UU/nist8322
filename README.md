@@ -1,4 +1,49 @@
-# Studentrepo på IOOPM
+# Inlupp 1: Hash Table & Frequency Counter
 
-* Organisera dina filer i den uppenbara katalogstrukturen. 
-* Se till att inte checka in skräp i ditt repo. 
+Detta repository innehåller en generisk implementation av en hashtabell och en länkad lista i C, komplett med iteratorer. Det inkluderar även programmet `freq_count` som använder hashtabellen för att läsa in och räkna ord-frekvenser i en eller flera textfiler.
+
+## Kompilering
+
+Projektet kompileras smidigast med den medföljande Makefilen:
+
+* **Bygg huvudprogrammet (freq_count):**
+  
+  make freq_count
+  
+* **Bygg alla enhetstester:**
+  
+  make test
+  
+* **Rensa bort kompilerade körbara filer:**
+  
+  make clean
+  
+
+## Körning
+
+### Frekvensräknare (freq_count)
+Programmet tar en eller flera textfiler som argument och skriver ut hur många gånger varje ord förekommer, sorterat i fallande ordning.
+
+
+./freq_count fil1.txt [fil2.txt ...]
+
+
+### Enhetstester
+För att bygga och köra CUnit-testerna (för både hashtabellen och den länkade listan) i ett svep:
+
+
+make test
+
+
+För att bygga och köra testerna med Valgrind för att verifiera att inga minnesläckor finns:
+
+
+make memtest
+
+
+## Designbeslut (Design Decisions)
+
+* **Generisk data (`elem_t`):** Datastrukturerna är typ-agnostiska och lagrar all data (både nycklar och värden) via unionen `elem_t`. För att hantera datatyper säkert används macros som `int_elem()` och `ptr_elem()`.
+* **Polymorfism via funktionspekare:** Hashtabellen är inte låst till en specifik datatyp (t.ex. strängar eller heltal). Istället skickar användaren in funktionspekare för hashning och jämförelse (`ioopm_hash_function`, `ioopm_eq_function`) när tabellen instansieras.
+* **Minnesägandeskap (Ownership):** Hashtabellen tar **inte** ägandeskap över minnet för dess nycklar och värden. Om dynamiskt allokerade strängar (t.ex. via `strdup`) sätts in i tabellen, är det anroparens ansvar att frigöra detta minne innan tabellen förstörs.
+* **Felhantering:** Grova användarfel (t.ex. att skicka in `NULL`-pekare istället för en instansierad hashtabell) fångas upp via `assert()` för att programmet ska avbrytas (fail-fast) snarare än att orsaka okontrollerade minnesfel. Mjukare fel, som uppslagning av nycklar som inte existerar, hanteras genom att funktionerna returnerar booleska värden (`false`).

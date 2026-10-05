@@ -34,20 +34,27 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value);
 /// @brief lookup value for key in hash table ht
 /// @param ht hash table operated upon
 /// @param key key to lookup
-/// @return the value mapped to by key (FIXME: what if the key does not exist?)
+/// @return the value mapped to by key, returns false if key doesn't exist
 bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t key, elem_t *result);
 
 /// @brief remove any mapping from key to a value
 /// @param ht hash table operated upon
 /// @param key key to remove
-/// @return the value mapped to by key (FIXME: what if the key does not exist?)
+/// @return the value mapped to by key, returns false if key doesn't exist
 int ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result);
 
-// TODO: documentation
+/// @brief checks if hash table has key
+/// @param ht hash table operated upon
+/// @param key key to check
+/// @return true or false depending on if the key exists
 bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, elem_t key);
 
-// TODO: documentation
+/// @brief checks if hash table is empty
+/// @param ht hash table checked
+/// @return true or false depending on if hash table is empty or not
 bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht);
 
-// TODO: documentation
+/// @brief gives size of hash table
+/// @param ht hash table which size is checked
+/// @return size of hash table 
 size_t ioopm_hash_table_size(ioopm_hash_table_t *ht);

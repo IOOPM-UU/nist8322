@@ -56,7 +56,7 @@ ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_
     return ht;
 }
 
-// Returnerar en int (1 för success, 0 för fail), och lägger värdet i pekaren 'result'
+
 int ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result) {
     
     entry_t *previous = find_previous_entry(ht, key);
@@ -69,16 +69,16 @@ int ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result) 
             *result = current->value;
         }
         
-        // 2. Överbrygga hålet
+       
         previous->next = current->next;
         
-        // 3. Frigör minnet
+       
         entry_destroy(current);
         
-        return 1; // Success!
+        return 1;
     }
     
-    return 0; // Fail! (Nyckeln fanns inte)
+    return 0;
 }
 
 
@@ -99,10 +99,10 @@ entry_t *find_previous_entry(ioopm_hash_table_t *ht, elem_t key)
 
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value)
 {
-  // find previous entry, or the last entry if the key does not exist
+ 
   entry_t *previous = find_previous_entry(ht, key);
 
-  // if the key exists, update the value, otherwise create a new entry
+  
   if (previous->next != NULL)
   {
     previous->next->value = value;
@@ -114,11 +114,11 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value)
 }
 
 bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t key, elem_t *result) {
-    // 1. Låt din redan fixade hjälpfunktion göra sökjobbet
+    
     entry_t *previous = find_previous_entry(ht, key);
     entry_t *current = previous->next;
     
-    // 2. Kolla om vi hittade en matchning
+  
     if (current != NULL && ht->key_eq_fn(current->key, key)) {
         if (result != NULL) {
             *result = current->value;
@@ -162,7 +162,7 @@ void remove_entry(ioopm_hash_table_t *ht, elem_t key) {
   }
 }
 
-// TODO: documentation
+
 bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, elem_t key) {
     // Skicka in NULL som result-pekare, vi bryr oss bara om true/false
     return ioopm_hash_table_lookup(ht, key, NULL);
