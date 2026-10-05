@@ -2,6 +2,10 @@
 
 Detta repository innehåller en generisk implementation av en hashtabell och en länkad lista i C, komplett med iteratorer. Det inkluderar även programmet `freq_count` som använder hashtabellen för att läsa in och räkna ord-frekvenser i en eller flera textfiler.
 
+## Författare
+Nils Strandell
+Wilmer Säfsten
+
 ## Kompilering
 
 Projektet kompileras smidigast med den medföljande Makefilen:
