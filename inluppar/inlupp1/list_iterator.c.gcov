@@ -1,0 +1,80 @@
+        -:    0:Source:list_iterator.c
+        -:    1:#include "list_iterator.h"
+        -:    2:#include <stdlib.h>
+        -:    3:#include <assert.h>
+        -:    4:#include "linked_list_private.h"
+        -:    5:#include <stddef.h>
+        -:    6:
+        -:    7:struct list_iterator {
+        -:    8:    ioopm_link_t *current;
+        -:    9:    ioopm_list_t *list;
+        -:   10:};
+        -:   11:
+function ioopm_list_iterator_create called 4 returned 100% blocks executed 75%
+        4:   12:ioopm_list_iterator_t *ioopm_list_iterator_create(ioopm_list_t *l) {
+        -:   13:    
+       4*:   14:    assert(l != NULL);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+call    2 never executed
+        -:   15:
+        4:   16:    ioopm_list_iterator_t *iter = calloc(1, sizeof(ioopm_list_iterator_t));
+        -:   17:
+        4:   18:    iter->list = l;
+        -:   19:
+        4:   20:    iter->current = l->first->next;
+        -:   21:
+        4:   22:    return iter;
+        -:   23:}
+        -:   24:
+function ioopm_list_iterator_destroy called 4 returned 100% blocks executed 100%
+        4:   25:void ioopm_list_iterator_destroy(ioopm_list_iterator_t *iter) {
+        4:   26:    free(iter);
+        4:   27:}
+        -:   28:
+function ioopm_list_iterator_at_end called 4 returned 100% blocks executed 83%
+        4:   29:bool ioopm_list_iterator_at_end(ioopm_list_iterator_t *iter) {
+       4*:   30:    assert(iter != NULL);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+call    2 never executed
+        -:   31:
+        4:   32:    if (iter->current == NULL) {
+branch  0 taken 50% (fallthrough)
+branch  1 taken 50%
+        2:   33:        return true;
+        -:   34:    }
+        -:   35:    else {
+        2:   36:        return false;
+        -:   37:    }
+        -:   38:}
+        -:   39:
+function ioopm_list_iterator_advance called 3 returned 100% blocks executed 80%
+        3:   40:void ioopm_list_iterator_advance(ioopm_list_iterator_t *iter) {
+       3*:   41:    assert(iter != NULL);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+call    2 never executed
+        -:   42:
+        3:   43:    if (iter->current != NULL) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        3:   44:        iter->current = iter->current->next;
+        -:   45:    }
+        3:   46:}
+        -:   47:
+function ioopm_list_iterator_current called 3 returned 100% blocks executed 75%
+        3:   48:elem_t ioopm_list_iterator_current(ioopm_list_iterator_t *iter) {
+       3*:   49:    assert(iter != NULL);
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+call    2 never executed
+        -:   50:    
+       3*:   51:    return iter->current != NULL ? iter->current->element : int_elem(0);
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:   52:}
+        -:   53:
+        -:   54:/* int ioopm_list_iterator_remove(ioopm_list_iterator_t *iter) {
+        -:   55:    // Optional
+        -:   56:} */

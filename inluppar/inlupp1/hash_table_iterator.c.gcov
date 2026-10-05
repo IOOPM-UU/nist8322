@@ -1,0 +1,112 @@
+        -:    0:Source:hash_table_iterator.c
+        -:    1:#include "hash_table_iterator.h"
+        -:    2:#include "hash_table_private.h"
+        -:    3:#include <stdbool.h>
+        -:    4:#include <stdlib.h>
+        -:    5:
+        -:    6:struct hash_table_iterator
+        -:    7:{
+        -:    8:  ioopm_hash_table_t *ht;
+        -:    9:  int current_bucket;
+        -:   10:  entry_t *current_entry;
+        -:   11:};
+        -:   12:
+        -:   13:// En enda smart funktion för att navigera hela tabellen säkert
+function advance_iterator_state called 108 returned 100% blocks executed 90%
+      108:   14:static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
+        -:   15:{
+        -:   16:
+     108*:   17:  if (it->current_bucket >= No_Buckets) return;
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:   18:
+        -:   19:
+      108:   20:  if (it->current_entry != NULL) {
+branch  0 taken 93% (fallthrough)
+branch  1 taken 7%
+      100:   21:    it->current_entry = it->current_entry->next;
+        -:   22:  }
+        -:   23:
+      428:   24:  while (it->current_entry == NULL)
+branch  0 taken 79%
+branch  1 taken 21% (fallthrough)
+        -:   25:  {
+      340:   26:    it->current_bucket += 1;
+        -:   27:
+        -:   28:
+      340:   29:    if (it->current_bucket >= No_Buckets)
+branch  0 taken 6% (fallthrough)
+branch  1 taken 94%
+        -:   30:    {
+       20:   31:      it->current_entry = NULL;
+       20:   32:      return;
+        -:   33:    }
+        -:   34:
+      320:   35:    it->current_entry = it->ht->buckets[it->current_bucket].next;
+        -:   36:  }
+        -:   37:}
+        -:   38:
+function ioopm_hash_table_iterator_create called 20 returned 100% blocks executed 100%
+       20:   39:ioopm_hash_table_iterator_t *ioopm_hash_table_iterator_create(ioopm_hash_table_t *ht)
+        -:   40:{
+        -:   41:  // calloc nollställer minnet! Det botar Valgrinds "uninitialised value"-varning
+       20:   42:  ioopm_hash_table_iterator_t *it = calloc(1, sizeof(ioopm_hash_table_iterator_t));
+       20:   43:  it->ht = ht;
+       20:   44:  it->current_bucket = 0;
+        -:   45:  
+        -:   46:  // Ställ iteratorn direkt på det första riktiga elementet (efter dummyn)
+       20:   47:  it->current_entry = ht->buckets[0].next;
+        -:   48:  
+        -:   49:  // Om bucket 0 var tom, använd vår smarta advance för att leta upp nästa data
+       20:   50:  if (it->current_entry == NULL)
+branch  0 taken 40% (fallthrough)
+branch  1 taken 60%
+        -:   51:  {
+        8:   52:    advance_iterator_state(it);
+call    0 returned 100%
+        -:   53:  }
+        -:   54:  
+       20:   55:  return it;
+        -:   56:}
+        -:   57:
+function ioopm_hash_table_iterator_destroy called 20 returned 100% blocks executed 100%
+       20:   58:void ioopm_hash_table_iterator_destroy(ioopm_hash_table_iterator_t *it)
+        -:   59:{
+       20:   60:  free(it);
+       20:   61:}
+        -:   62:
+function ioopm_hash_table_iterator_advance called 100 returned 100% blocks executed 100%
+      100:   63:void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it)
+        -:   64:{
+      100:   65:  advance_iterator_state(it); 
+call    0 returned 100%
+      100:   66:}
+        -:   67:
+function ioopm_hash_table_iterator_current_key called 16 returned 100% blocks executed 83%
+       16:   68:elem_t ioopm_hash_table_iterator_current_key(ioopm_hash_table_iterator_t *it)
+        -:   69:{
+        -:   70:
+      16*:   71:  return it->current_entry != NULL ? it->current_entry->key : ptr_elem(NULL);
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:   72:}
+        -:   73:
+function ioopm_hash_table_iterator_current_value called 16 returned 100% blocks executed 83%
+       16:   74:elem_t ioopm_hash_table_iterator_current_value(ioopm_hash_table_iterator_t *it)
+        -:   75:{
+        -:   76:  
+      16*:   77:  return it->current_entry != NULL ? it->current_entry->value : int_elem(0);
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:   78:}
+        -:   79:
+function ioopm_hash_table_iterator_at_end called 120 returned 100% blocks executed 100%
+      120:   80:bool ioopm_hash_table_iterator_at_end(ioopm_hash_table_iterator_t *it)
+        -:   81:{
+        -:   82:
+      120:   83:  return it->current_bucket >= No_Buckets || it->current_entry == NULL;
+branch  0 taken 83% (fallthrough)
+branch  1 taken 17%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+        -:   84:}

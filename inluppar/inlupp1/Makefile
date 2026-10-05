@@ -28,3 +28,12 @@ memtest: list_tests ht_tests
 # Regel 6: Städa upp (ta bort de kompilerade filerna)
 clean:
 	rm -f list_tests ht_tests freq_count
+
+# Regel för att mäta kodtäckning
+coverage:
+	$(CC) $(CFLAGS) --coverage linked_list.c list_iterator.c linked_list_test.c $(LDLIBS) -o list_tests
+	$(CC) $(CFLAGS) --coverage hash_table.c hash_table_iterator.c hash_table_tests.c $(LDLIBS) -o ht_tests
+	./list_tests
+	./ht_tests
+	gcov -b list_tests-linked_list.gcno list_tests-list_iterator.gcno
+	gcov -b ht_tests-hash_table.gcno ht_tests-hash_table_iterator.gcno
