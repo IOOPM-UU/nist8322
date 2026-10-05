@@ -67,3 +67,18 @@ make coverage
 * `hash_table_iterator.c`: 100.00% line coverage, 100.00% branch coverage
 * `linked_list.c`: 91.76% line coverage, 100.00% branch coverage
 * `list_iterator.c`: 100.00% line coverage, 100.00% branch coverage
+
+# Initial Profiling Results
+
+**Profileringsmetod:** Kompilerades med flaggan `-pg` och analyserades med verktyget `gprof`. Eftersom programmets exekvering gick så snabbt att ingen tid hann ackumuleras, baseras analysen på antalet funktionsanrop.
+
+**Topp 3 funktioner:**
+1. `string_eq`
+2. `find_previous_entry`
+3. `string_hash`
+
+**Analys:**
+* **Egen kod vs. Bibliotek:** Alla tre är funktioner skrivna i min egen kod, inte inbyggda standardfunktioner från C-biblioteket.
+* **Konsistens & Trender:** Dessa tre funktioner ligger konsekvent i topp oavsett vilken indatafil som används. Den tydligaste trenden är att när datamängden växer, ökar det absoluta antalet anrop till dessa specifika funktioner kraftigt, men deras inbördes ordning förblir oförändrad.
+* **Förväntningar:** Detta stämmer helt överens med förväntningarna. En ordfrekvensräknare baserad på en hashtabell kommer naturligt att lägga majoriteten av sin exekveringstid på att hasha nycklar, vandra genom länkade listor (buckets) och jämföra strängar för att hitta matchningar eller lösa kollisioner.
+* **Optimering:** Eftersom `find_previous_entry` och `string_eq` dominerar, lägger programmet uppenbarligen mycket resurser på kollisionshantering. Det mest effektiva sättet att göra programmet snabbare vore att implementera en självanpassande logik (dynamisk resizing) som ökar det totala antalet buckets när belastningsgradenblir för hög. Fler buckets ger kortare listor, vilket skulle minska antalet nödvändiga strängjämförelser.
