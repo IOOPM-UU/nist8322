@@ -13,6 +13,8 @@ size_t string_hash(elem_t key) {
     return result;
 }
 
+size_t string_knr_hash(elem_t key);
+
 bool string_eq(elem_t a, elem_t b) {
     return strcmp((char *)a.p, (char *)b.p) == 0;
 }
@@ -486,6 +488,25 @@ void test_iter_same_bucket()
   ioopm_hash_table_destroy(ht);
 }
 
+
+
+void test_string_keys(void) {
+    // Skapa tabellen med funktionerna för strängar
+    ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash, string_eq);
+
+    // Sätt in ett värde med en sträng som nyckel
+    ioopm_hash_table_insert(ht, ptr_elem("test_nyckel"), int_elem(42));
+
+    // Kontrollera att det går att slå upp
+    elem_t result;
+    bool found = ioopm_hash_table_lookup(ht, ptr_elem("test_nyckel"), &result);
+
+    CU_ASSERT_TRUE(found);
+    CU_ASSERT_EQUAL(result.i, 42);
+
+    ioopm_hash_table_destroy(ht);
+}
+
 int main() {
   if (CU_initialize_registry() != CUE_SUCCESS)
     return CU_get_error();
@@ -521,7 +542,8 @@ int main() {
     (CU_add_test(my_test_suite, "Test Size Larger", test_size_larger) == NULL) ||
     (CU_add_test(my_test_suite, "Test Size After Removing", test_size_after_removing) == NULL) ||
     (CU_add_test(my_test_suite, "Test Is Empty", test_is_empty) == NULL) ||
-    (CU_add_test(my_test_suite, "Test Is Not Empty", test_is_not_empty) == NULL)
+    (CU_add_test(my_test_suite, "Test Is Not Empty", test_is_not_empty) == NULL) ||
+    (CU_add_test(my_test_suite, "Test String Keys", test_string_keys) == NULL)
   )
     {
       CU_cleanup_registry();
