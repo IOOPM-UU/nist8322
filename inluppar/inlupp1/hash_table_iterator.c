@@ -38,7 +38,7 @@ static void advance_iterator_state(ioopm_hash_table_iterator_t *it)
 
 ioopm_hash_table_iterator_t *ioopm_hash_table_iterator_create(ioopm_hash_table_t *ht)
 {
-  // calloc nollställer minnet! Det botar Valgrinds "uninitialised value"-varning
+  
   ioopm_hash_table_iterator_t *it = calloc(1, sizeof(ioopm_hash_table_iterator_t));
   it->ht = ht;
   it->current_bucket = 0;
@@ -46,7 +46,7 @@ ioopm_hash_table_iterator_t *ioopm_hash_table_iterator_create(ioopm_hash_table_t
   // Ställ iteratorn direkt på det första riktiga elementet (efter dummyn)
   it->current_entry = ht->buckets[0].next;
   
-  // Om bucket 0 var tom, använd vår smarta advance för att leta upp nästa data
+  // Om bucket 0 var tom, använd advance för att leta upp nästa
   if (it->current_entry == NULL)
   {
     advance_iterator_state(it);
