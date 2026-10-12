@@ -3,33 +3,33 @@ CC = gcc
 CFLAGS = -Wall -pedantic -g
 LDLIBS = -lcunit
 
-# Regel 1: Kompilera länkade listans tester
+# Kompilera länkade listans tester
 list_tests: linked_list.c list_iterator.c linked_list_test.c
 	$(CC) $(CFLAGS) linked_list.c list_iterator.c linked_list_test.c $(LDLIBS) -o list_tests
 
-# Regel 2: Kompilera hash-tabellens tester (som vi jobbade med nyss)
+# Kompilera hash-tabellens tester
 ht_tests: hash_table.c hash_table_iterator.c hash_table_tests.c
 	$(CC) $(CFLAGS) hash_table.c hash_table_iterator.c hash_table_tests.c $(LDLIBS) -o ht_tests
 
-# Regel 3: Kompilera huvudprogrammet freq_count (här behövs inte -lcunit, men filerna för datastrukturerna måste vara med)
+# Kompilera huvudprogrammet freq_count
 freq_count: freq_count.c hash_table.c hash_table_iterator.c linked_list.c list_iterator.c
 	$(CC) $(CFLAGS) freq_count.c hash_table.c hash_table_iterator.c linked_list.c list_iterator.c -o freq_count
 
-# Regel 4: Kör testerna
+# Kör testerna
 test: list_tests ht_tests
 	./list_tests
 	./ht_tests
 
-# Regel 5: Kör testerna genom Valgrind
+# Kör testerna genom Valgrind
 memtest: list_tests ht_tests
 	valgrind --leak-check=full ./list_tests
 	valgrind --leak-check=full ./ht_tests
 
-# Regel 6: Städa upp (ta bort de kompilerade filerna)
+# Städa upp (ta bort de kompilerade filerna)
 clean:
 	rm -f list_tests ht_tests freq_count
 
-# Regel för att mäta kodtäckning
+# Att mäta kodtäckning
 coverage:
 	$(CC) $(CFLAGS) --coverage linked_list.c list_iterator.c linked_list_test.c $(LDLIBS) -o list_tests
 	$(CC) $(CFLAGS) --coverage hash_table.c hash_table_iterator.c hash_table_tests.c $(LDLIBS) -o ht_tests
