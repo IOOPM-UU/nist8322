@@ -12,6 +12,23 @@ int clean_suite(void) {
     return 0;
 }
 
+void test_is_shelf(void) {
+
+    CU_ASSERT_TRUE(is_shelf("A25"));
+    CU_ASSERT_TRUE(is_shelf("Z999"));
+    CU_ASSERT_TRUE(is_shelf("B0"));
+
+    CU_ASSERT_FALSE(is_shelf("A"));
+    CU_ASSERT_FALSE(is_shelf(""));
+
+    CU_ASSERT_FALSE(is_shelf("125"));
+    CU_ASSERT_FALSE(is_shelf("-A25"));
+
+    CU_ASSERT_FALSE(is_shelf("AB25"));
+    CU_ASSERT_FALSE(is_shelf("A25B"));
+    CU_ASSERT_FALSE(is_shelf("A 25"));
+}
+
 void test_add_to_empty(void) {
     db_t *db = db_create();
     char *name = "Chair";
@@ -128,6 +145,30 @@ void test_remove_merch_edge_cases(void) {
     db_destroy(db);
 }
 
+void test_remove_from_cart(void) {
+    db_t *db = db_create();
+    
+    add_merch_to_db(db, "cola", "kolsyrad dryck", 12);
+    add_stock(db, "cola", 10, "A12");
+    int cart_id = create_cart(db);
+    
+    add_to_cart(db, cart_id, "cola", 5);
+    CU_ASSERT_EQUAL(get_cart_reserved_stock(db, "cola"), 5);
+    
+    CU_ASSERT_TRUE(remove_from_cart(db, cart_id, "cola", 2));
+    CU_ASSERT_EQUAL(get_cart_reserved_stock(db, "cola"), 3);
+    
+    CU_ASSERT_FALSE(remove_from_cart(db, cart_id, "cola", 10));
+    CU_ASSERT_EQUAL(get_cart_reserved_stock(db, "cola"), 3);
+
+    CU_ASSERT_TRUE(remove_from_cart(db, cart_id, "cola", 3));
+    CU_ASSERT_EQUAL(get_cart_reserved_stock(db, "cola"), 0);
+
+    CU_ASSERT_FALSE(remove_from_cart(db, cart_id, "cola", 1));
+    
+    db_destroy(db);
+}
+
 int main() {
     if (CU_initialize_registry() != CUE_SUCCESS)
         return CU_get_error();
@@ -148,7 +189,9 @@ int main() {
         (CU_add_test(db_test_suite, "Edit DB edge cases", test_edit_db_edge_cases) == NULL) ||
         (CU_add_test(db_test_suite, "Add stock edge cases", test_add_stock_edge_cases) == NULL) ||
         (CU_add_test(db_test_suite, "Checkout cart edge cases", test_checkout_cart_edge_cases) == NULL) ||
-        (CU_add_test(db_test_suite, "Remove merch edge cases", test_remove_merch_edge_cases) == NULL)
+        (CU_add_test(db_test_suite, "Remove merch edge cases", test_remove_merch_edge_cases) == NULL) ||
+        (CU_add_test(db_test_suite, "Remove merch from cart", test_remove_from_cart) == NULL) ||
+        (CU_add_test(db_test_suite, "Is shelf", test_is_shelf) == NULL)
     ) {
         CU_cleanup_registry();
         return CU_get_error();

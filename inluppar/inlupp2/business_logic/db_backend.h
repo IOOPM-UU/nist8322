@@ -135,3 +135,8 @@ int create_cart(db_t *db);
 /// @param cart_id ID of the cart to remove
 /// @return true if successful, false if the cart doesn't exist
 bool remove_cart(db_t *db, int cart_id);
+
+/// @brief Checks if a given string is a valid shelf format (e.g., a letter followed by digits)
+/// @param str the string to be validated
+/// @return true if the string is a valid shelf format, false otherwise
+bool is_shelf(char *str);

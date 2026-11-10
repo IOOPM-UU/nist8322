@@ -33,6 +33,18 @@ char ask_question_menu(void) {
     } 
 }
 
+char *ask_question_shelf(char *question) {
+    char *shelf = ask_question_string(question);
+
+    while (!is_shelf(shelf)) {
+        puts("Ogiltigt format! En hylla måste börja med en bokstav följt av siffror (t.ex. A25).");
+        free(shelf); 
+        shelf = ask_question_string(question);
+    }
+
+    return shelf;
+}
+
 
 void print_menu(void) {
     char *menu = "\n  WEBSHOP MENU  \n"
@@ -145,25 +157,41 @@ void frontend_remove_merch(db_t *db) {
 
 void frontend_edit_merch(db_t *db) {
     char *old_name = ask_question_string("Vilken vara vill du redigera?: ");
+    
+    if (!get_merch(db, old_name)) {
+        puts("Fel: Varan finns inte i databasen.");
+        free(old_name);
+        return;
+    }
+
+    if (get_cart_reserved_stock(db, old_name) > 0) {
+        puts("Fel: Varan ligger just nu i en kundvagn och kan därför inte redigeras.");
+        free(old_name);
+        return;
+    }
+
     char *new_name = ask_question_string("Nytt namn: ");
     char *new_desc = ask_question_string("Ny beskrivning: ");
     int new_price = ask_question_int("Nytt pris: ");
-    char *confirmation = ask_question_string("Är du säker? [Y/N] ");
-
-    if (strlen(confirmation) > 0 && toupper(confirmation[0]) == 'Y') {
+    
+    char *confirm = ask_question_string("Är du säker? [Y/N]: ");
+    
+    if (confirm[0] == 'Y' || confirm[0] == 'y') {
         if (edit_db(db, old_name, new_name, new_desc, new_price)) {
             puts("Varan har redigerats!");
         } else {
-            puts("Fel: Varan fanns inte i databasen");
+            puts("Fel: Kunde inte redigera (kanske finns det nya namnet redan?).");
+            free(new_name);
+            free(new_desc);
         }
     } else {
-        puts("Avbryter redigering");
+        puts("Redigering avbruten.");
+        free(new_name);
+        free(new_desc);
     }
-
+    
+    free(confirm);
     free(old_name);
-    free(confirmation);
-    free(new_name);
-    free(new_desc);
 }
 
 void frontend_show_stock(db_t *db) {
@@ -197,7 +225,7 @@ void frontend_show_stock(db_t *db) {
 }
 
 void frontend_replenish(db_t *db) {
-    char *shelf = ask_question_string("Vilken hylla vill du fylla på? (t.ex A20): ");
+    char *shelf = ask_question_shelf("Vilken hylla vill du fylla på? (t.ex A20): ");
     char *name = ask_question_string("Vilken vara vill du fylla på?: ");
     int amount = ask_question_int("Hur många vill du lägga till?: ");
 

@@ -213,6 +213,10 @@ bool add_stock(db_t *db, char *name, int amount, char *shelf) {
 }
 
 bool edit_db(db_t *db, char *old_name, char *new_name, char *new_desc, int new_price) {
+    if (get_cart_reserved_stock(db, old_name) > 0) {
+        return false; 
+    }
+    
     merch_t *merch = get_merch(db, old_name);
     if (merch == NULL) {
         return false; 
