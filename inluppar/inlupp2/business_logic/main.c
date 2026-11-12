@@ -12,4 +12,4 @@ int main(void) {
     db_destroy(db);
 
     return 0;
-} 
+}

@@ -12,17 +12,28 @@
 #include "linked_list_private.h"
 #include "list_iterator.h"
 
-char ask_question_menu(void) {
+// Hjälpfunktion för qsort som jämför namnen på två varor
+static int cmp_merch(const void *a, const void *b) {
+    merch_t *m1 = *(merch_t **)a;
+    merch_t *m2 = *(merch_t **)b;
+    return strcmp(m1->name, m2->name);
+}
 
+char ask_question_menu(void) {
     char *valid_options = "AaLlDdEeSsPpCcRr+-=OoUuQq"; 
 
     while(true) {
         print_menu();
-    
+
         char *answer = ask_question_string("\nVälj ett alternativ: ");
 
+        if (answer == NULL || strlen(answer) == 0) {
+            free(answer);
+            return 'Q'; 
+        }
+
         if (strlen(answer) == 1 && strchr(valid_options, answer[0]) != NULL) {
-            char choice = toupper(answer[0]); // toupper gör inget med +, -, =
+            char choice = toupper(answer[0]);
             free(answer);
             return choice;
         }
@@ -30,7 +41,7 @@ char ask_question_menu(void) {
             puts("Ogiltigt val, försök igen");
         }
         free(answer);
-    } 
+    }
 }
 
 char *ask_question_shelf(char *question) {
@@ -81,12 +92,7 @@ void frontend_add_merch(db_t *db) {
     free(desc);
 }
 
-// Hjälpfunktion för qsort som jämför namnen på två varor
-static int cmp_merch(const void *a, const void *b) {
-    merch_t *m1 = *(merch_t **)a;
-    merch_t *m2 = *(merch_t **)b;
-    return strcmp(m1->name, m2->name);
-}
+
 
 void frontend_list_merch(db_t *db) {
     // Hur många varor som finns i databasen
@@ -181,15 +187,15 @@ void frontend_edit_merch(db_t *db) {
             puts("Varan har redigerats!");
         } else {
             puts("Fel: Kunde inte redigera (kanske finns det nya namnet redan?).");
-            free(new_name);
-            free(new_desc);
         }
     } else {
         puts("Redigering avbruten.");
-        free(new_name);
-        free(new_desc);
+        // free(new_name);
+        // free(new_desc);
     }
     
+    free(new_name);
+    free(new_desc);
     free(confirm);
     free(old_name);
 }
